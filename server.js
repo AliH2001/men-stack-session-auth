@@ -9,7 +9,7 @@ const methodOverride = require('method-override')
 const morgan = require('morgan')
 const path = require('path')
 
-const port = 3000;
+const port = 3100;
 
 // creates a connection to MONGO database
 mongoose.connect(process.env.MONGODB_URI);
@@ -30,7 +30,8 @@ const authCtrl = require('./controllers/auth')
 app.get('/', pagesCtrl.home)
 app.get('/auth/sign-up', authCtrl.signUp)
 app.post('/auth/sign-up', authCtrl.addUser)
-
+app.get('/auth/sign-in', authCtrl.signInForm)
+app.post('/auth/sign-in', authCtrl.signIn)
 app.listen(port, () => {
     console.log(`The express app is ready on port ${port}`)
 })
