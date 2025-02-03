@@ -55,8 +55,8 @@ const signIn = async (req, res) => {
             msg: 'Invalid credentials. Please try again.'
         })
     }
-
-    req.session.user = {
+    // console.log( 'test ' + req.session)
+    req.session = {
         username: userInDatabase.username,
     }
     console.log('req.session: ', req.session)
