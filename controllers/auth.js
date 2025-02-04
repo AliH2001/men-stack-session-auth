@@ -2,16 +2,16 @@ const bcrypt = require('bcrypt')
 const User = require('../models/user')
 
 const signUp = (req, res) => {
-    res.render('auth/sign-up.ejs',
-        { title: 'Sign up', msg: '' })
+    res.render('auth/sign-up.ejs', 
+        {title: 'Sign up', msg: ''} )
 }
 
 const addUser = async (req, res) => {
     console.log('request body: ', req.body)
-    const userInDatabase = await User.findOne({ username: req.body.username })
+    const userInDatabase = await User.findOne({ username: req.body.username})
     if (userInDatabase) {
-        return res.render('auth/sign-up.ejs', {
-            title: 'Sign up',
+        return res.render('auth/sign-up.ejs',{
+            title: 'Sign up', 
             msg: 'Username already taken.'
         })
     }
@@ -25,8 +25,15 @@ const addUser = async (req, res) => {
     req.body.password = hashedPassword
 
     const user = await User.create(req.body)
-    console.log('new user: ', user)
-    return res.send(`Thanks for signing up ${user.username}`)
+    
+    req.session.user = {
+        username: user.username,
+    }
+    
+    req.session.save(() => {
+        res.redirect('/')
+    })
+    
 }
 
 const signInForm = (req, res) => {
@@ -55,14 +62,24 @@ const signIn = async (req, res) => {
             msg: 'Invalid credentials. Please try again.'
         })
     }
-    // console.log( 'test ' + req.session)
-    req.session = {
+
+    req.session.user = {
         username: userInDatabase.username,
     }
-    console.log('req.session: ', req.session)
+    
+    req.session.save(() => {
+        res.redirect('/')
+    })
 
-    res.redirect('/')
 
+}
+
+const signOut = (req, res) => {
+    req.session.destroy(() => {
+        res.clearCookie('connect.sid')
+        res.redirect('/')
+    })
+    
 }
 
 module.exports = {
@@ -70,4 +87,5 @@ module.exports = {
     addUser,
     signInForm,
     signIn,
+    signOut,
 }
